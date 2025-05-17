@@ -25,82 +25,49 @@ export const buttonLabels = [
 export const App = () => {
   const [goods, setGoods] = useState([...goodsFromServer]);
   const [buttonArr, setButtonArr] = useState([...buttonLabels]);
-  const [isAlpha, setIsAlpha] = useState('is-light');
-  const [isLength, setIsLength] = useState('is-light');
-  const [isReverse, setIsReverse] = useState('is-light');
+  const [isAlpha, setIsAlpha] = useState(true);
+  const [isLength, setIsLength] = useState(true);
+  const [isReverse, setIsReverse] = useState(true);
 
   const setAlphabetically = () => {
-    setIsAlpha('');
-    setIsLength('is-light');
-    setGoods(prevGoods => {
-      let sortedGoods = [];
-
-      if (isAlpha === 'is-light' && isReverse === 'is-light') {
-        sortedGoods = [...prevGoods].sort((a, b) => a.localeCompare(b));
-      } else if (
-        (isLength === '' && isReverse === '') ||
-        (isLength === 'is-light' && isReverse === '')
-      ) {
-        sortedGoods = [...prevGoods].sort((a, b) => b.localeCompare(a));
-      }
-
-      return sortedGoods;
-    });
-
     if (!buttonArr.includes('Reset')) {
       setButtonArr([...buttonArr, 'Reset']);
     }
+
+    if (isReverse === false) {
+      return setGoods(prevGoods => {
+        return [...prevGoods].toSorted((a, b) => b.localeCompare(a));
+      });
+    }
+
+    return setGoods(prevGoods => {
+      return [...prevGoods].toSorted((b, a) => b.localeCompare(a));
+    });
   };
 
   const setByLength = () => {
-    setIsLength('');
-    setIsAlpha('is-light');
-
-    setGoods(prevGoods => {
-      let sortedGoods = [];
-
-      if (isLength === 'is-light' && isReverse === 'is-light') {
-        sortedGoods = [...prevGoods].sort((a, b) => a.length - b.length);
-      } else if (
-        (isLength === '' && isReverse === '') ||
-        (isLength === 'is-light' && isReverse === '')
-      ) {
-        sortedGoods = [...prevGoods].sort((a, b) => b.length - a.length);
-      }
-
-      return sortedGoods;
-    });
-
     if (!buttonArr.includes('Reset')) {
       setButtonArr([...buttonArr, 'Reset']);
     }
+
+    if (isReverse === false) {
+      return setGoods(goods.toSorted((a, b) => b.length - a.length));
+    }
+
+    return setGoods(goods.toSorted((a, b) => a.length - b.length));
   };
 
   const reverseArray = () => {
-    setIsReverse(prev => (prev === '' ? 'is-light' : ''));
-
-    setGoods(prevGoods => {
-      const sortedGoods = [...prevGoods].reverse();
-
-      return sortedGoods;
-    });
-
     if (!buttonArr.includes('Reset')) {
       setButtonArr([...buttonArr, 'Reset']);
-    } else if (
-      buttonArr.includes('Reset') &&
-      isAlpha === 'is-light' &&
-      isLength === 'is-light' &&
-      isReverse === ''
-    ) {
+    } else if (isAlpha && isLength && !isReverse) {
       setButtonArr([...buttonLabels]);
     }
+
+    setGoods([...goods].reverse());
   };
 
   const resetArray = () => {
-    setIsAlpha('is-light');
-    setIsLength('is-light');
-    setIsReverse('is-light');
     setGoods([...goodsFromServer]);
     if (buttonArr.includes('Reset')) {
       setButtonArr([...buttonLabels]);
@@ -109,13 +76,21 @@ export const App = () => {
 
   const handleClickBtn = button => {
     if (button === 'Sort alphabetically') {
-      setAlphabetically();
+      setIsAlpha(false);
+      setIsLength(true);
+      setAlphabetically(button);
     } else if (button === 'Sort by length') {
-      setByLength();
+      setIsLength(false);
+      setIsAlpha(true);
+      setByLength(button);
     } else if (button === 'Reverse') {
+      setIsReverse(prev => !prev);
       reverseArray();
-    } else {
-      resetArray();
+    } else if (button === 'Reset') {
+      setIsAlpha(true);
+      setIsLength(true);
+      setIsReverse(true);
+      resetArray(button);
     }
   };
 
@@ -132,10 +107,15 @@ export const App = () => {
               }}
               className={classNames({
                 button: true,
-                [`is-info ${isAlpha}`]: button === 'Sort alphabetically',
-                [`is-success ${isLength}`]: button === 'Sort by length',
-                [`is-warning ${isReverse}`]: button === 'Reverse',
-                [`is-danger is-light`]: button === 'Reset',
+                'is-info': button === 'Sort alphabetically',
+                'is-success': button === 'Sort by length',
+                'is-warning': button === 'Reverse',
+                'is-danger': button === 'Reset',
+                'is-light':
+                  (button === 'Sort alphabetically' && isAlpha) ||
+                  (button === 'Sort by length' && isLength) ||
+                  (button === 'Reverse' && isReverse) ||
+                  button === 'Reset',
               })}
             >
               {button}
