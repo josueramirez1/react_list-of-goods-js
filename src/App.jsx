@@ -33,25 +33,20 @@ export const App = () => {
     setIsAlpha('');
     setIsLength('is-light');
     setGoods(prevGoods => {
+      let sortedGoods = [];
+
       if (isAlpha === 'is-light' && isReverse === 'is-light') {
-        const sortedGoods = [...prevGoods].sort((a, b) => a.localeCompare(b));
-
-        return sortedGoods;
-      }
-
-      if (
+        sortedGoods = [...prevGoods].sort((a, b) => a.localeCompare(b));
+      } else if (
         (isLength === '' && isReverse === '') ||
         (isLength === 'is-light' && isReverse === '')
       ) {
-        const sortedGoods = [...prevGoods].sort((a, b) => b.localeCompare(a));
-
-        return sortedGoods;
+        sortedGoods = [...prevGoods].sort((a, b) => b.localeCompare(a));
       }
-
-      const sortedGoods = [...prevGoods];
 
       return sortedGoods;
     });
+
     if (!buttonArr.includes('Reset')) {
       setButtonArr([...buttonArr, 'Reset']);
     }
@@ -62,22 +57,16 @@ export const App = () => {
     setIsAlpha('is-light');
 
     setGoods(prevGoods => {
+      let sortedGoods = [];
+
       if (isLength === 'is-light' && isReverse === 'is-light') {
-        const sortedGoods = [...prevGoods].sort((a, b) => a.length - b.length);
-
-        return sortedGoods;
-      }
-
-      if (
-        (isAlpha === '' && isReverse === '') ||
-        (isAlpha === 'is-light' && isReverse === '')
+        sortedGoods = [...prevGoods].sort((a, b) => a.length - b.length);
+      } else if (
+        (isLength === '' && isReverse === '') ||
+        (isLength === 'is-light' && isReverse === '')
       ) {
-        const sortedGoods = [...prevGoods].sort((a, b) => b.length - a.length);
-
-        return sortedGoods;
+        sortedGoods = [...prevGoods].sort((a, b) => b.length - a.length);
       }
-
-      const sortedGoods = [...prevGoods];
 
       return sortedGoods;
     });
@@ -88,22 +77,6 @@ export const App = () => {
   };
 
   const reverseArray = () => {
-    if (
-      buttonArr.includes('Reset') &&
-      isAlpha === 'is-light' &&
-      isLength === 'is-light' &&
-      isReverse === ''
-    ) {
-      setButtonArr([...buttonLabels]);
-    } else if (
-      !buttonArr.includes('Reset') &&
-      isAlpha === 'is-light' &&
-      isLength === 'is-light' &&
-      isReverse === 'is-light'
-    ) {
-      setButtonArr([...buttonArr, 'Reset']);
-    }
-
     setIsReverse(prev => (prev === '' ? 'is-light' : ''));
 
     setGoods(prevGoods => {
@@ -111,6 +84,17 @@ export const App = () => {
 
       return sortedGoods;
     });
+
+    if (!buttonArr.includes('Reset')) {
+      setButtonArr([...buttonArr, 'Reset']);
+    } else if (
+      buttonArr.includes('Reset') &&
+      isAlpha === 'is-light' &&
+      isLength === 'is-light' &&
+      isReverse === ''
+    ) {
+      setButtonArr([...buttonLabels]);
+    }
   };
 
   const resetArray = () => {
